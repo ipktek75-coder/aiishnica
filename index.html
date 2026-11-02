@@ -1,0 +1,1041 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ИИшница для Чайников — курс про искусственный интеллект для тех, кому 50+</title>
+  <meta name="description" content="10 уроков по 30 минут. Научитесь пользоваться искусственным интеллектом так же легко, как готовить яичницу. Курс для людей 50+, нужен только смартфон.">
+  <meta name="theme-color" content="#3B2314">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🍳</text></svg>">
+
+  <!-- Tailwind CSS (CDN) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    // Тёплая "домашняя" палитра + акцентный голубой для ИИ-элементов
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            cream: '#FFF8F0',
+            paper: '#F7ECD5',
+            beige: '#F3E4C8',
+            gold: '#E8A81C',
+            golddeep: '#8A5A00',
+            warm: '#E2731B',
+            brown: '#6B4226',
+            browndeep: '#3B2314',
+            ink: '#2B2118',
+            aiblue: '#00D4FF',
+            leaf: '#5C8A3A'
+          },
+          fontFamily: {
+            sans: ['-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif']
+          }
+        }
+      }
+    };
+  </script>
+
+  <!-- Флаг "JS включён" — чтобы анимации не спрятали контент, если JS отключён -->
+  <script>document.documentElement.classList.add('js');</script>
+
+  <style>
+    /* ============ БАЗА: крупный читаемый текст и высокий контраст ============ */
+    :root {
+      --cream: #FFF8F0;
+      --paper: #F7ECD5;
+      --gold: #E8A81C;
+      --warm: #E2731B;
+      --brown: #6B4226;
+      --browndeep: #3B2314;
+      --ink: #2B2118;
+      --ai: #00D4FF;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      scroll-padding-top: 96px; /* чтобы фиксированное меню не перекрывало заголовки секций */
+      -webkit-text-size-adjust: 100%;
+    }
+
+    body {
+      margin: 0;
+      background-color: var(--cream);
+      color: var(--ink);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      font-size: 18px;       /* минимум 18px для основного текста */
+      line-height: 1.65;
+      overflow-x: hidden;
+    }
+
+    /* Крупные заголовки — удобно читать */
+    h1, h2, h3 { line-height: 1.2; letter-spacing: -0.01em; }
+
+    /* Крупные кнопки: минимум 68px по высоте, удобная зона нажатия пальцем */
+    .btn-big {
+      display: inline-flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      gap: 0.6rem;
+      max-width: 100%;      /* кнопка никогда не вылезает за пределы экрана */
+      min-height: 68px;
+      padding: 1.1rem 2.25rem;
+      font-size: 1.25rem;     /* 20px */
+      font-weight: 800;
+      line-height: 1.25;
+      border-radius: 9999px;
+      text-align: center;
+      text-decoration: none;
+      transition: transform .25s ease, box-shadow .25s ease, background-color .25s ease;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .btn-big:active { transform: scale(.97); }
+
+    /* ============ БЛОК 1: HERO ============ */
+    /* Картинка hero.jpg — фон на весь экран */
+    #hero {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      align-items: center;
+      height: 100vh;                             /* на весь экран */
+      height: 100svh;                            /* точнее на смартфонах с панелью браузера */
+      padding: 100px 20px 60px;                  /* отступ кнопки от верха — 100px */
+      background-image: url('hero.jpg');
+      background-size: contain;                  /* картинка показывается целиком, без обрезки */
+      background-position: center bottom;        /* нижняя часть с надписью — у нижнего края */
+      background-repeat: no-repeat;
+      background-color: #1a1a1a;                 /* тёмный фон для пустых полей по краям */
+      overflow: hidden;                          /* частицы не создают прокрутку */
+    }
+
+    /* Лёгкий тёмный оверлей — картинка остаётся хорошо видна */
+    #hero::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.3);
+      z-index: 1;
+    }
+
+    /* Кнопка — поверх оверлея и поверх частиц (z-index: 10).
+       Внимание: у обёртки НЕ должно быть position/transform, иначе она станет
+       containing block для absolute-кнопки и её top/right посчитаются от обёртки. */
+    #hero .hero__cta {
+      z-index: 10;
+      pointer-events: auto;                      /* кнопка всегда кликабельна */
+    }
+    /* ============ Кнопка с ИИ-эффектом: пульсация + голубое свечение (#00D4FF) ============ */
+    .btn-ai {
+      position: relative;
+      isolation: isolate;
+      color: #06222B;
+      background: linear-gradient(135deg, #8BE9FF 0%, var(--ai) 42%, #7CC6FF 100%);
+      border: 3px solid rgba(255, 255, 255, .9);
+      border-radius: 9999px;
+      box-shadow: 0 0 0 6px rgba(0, 212, 255, .22), 0 0 34px rgba(0, 212, 255, .70), 0 12px 28px rgba(0, 0, 0, .35);
+      animation: aiPulse 2.2s ease-in-out infinite;
+    }
+    .btn-ai:hover { animation-play-state: paused; }
+
+    /* «ИИ-узор»: мелкая голубая сетка точек внутри кнопки */
+    .btn-ai__dots {
+      position: absolute;
+      inset: 0;
+      border-radius: 9999px;
+      background-image: radial-gradient(rgba(255, 255, 255, .8) 1.4px, transparent 1.5px);
+      background-size: 12px 12px;
+      opacity: .45;
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    /* Вращающееся голубое кольцо вокруг кнопки */
+    .btn-ai__ring {
+      position: absolute;
+      inset: -16px;
+      border-radius: 9999px;
+      background: conic-gradient(from 0deg, rgba(0, 212, 255, 0) 0 62%, rgba(0, 212, 255, .95) 82%, rgba(0, 212, 255, 0) 100%);
+      filter: blur(1.5px);
+      animation: aiSpin 3.6s linear infinite;
+      pointer-events: none;
+      z-index: -2;
+    }
+
+    @keyframes aiPulse {
+      0%, 100% {
+        box-shadow: 0 0 0 6px rgba(0, 212, 255, .22), 0 0 30px rgba(0, 212, 255, .65), 0 12px 28px rgba(0, 0, 0, .35);
+        transform: scale(1);
+      }
+      50% {
+        box-shadow: 0 0 0 18px rgba(0, 212, 255, 0), 0 0 52px rgba(0, 212, 255, .95), 0 12px 28px rgba(0, 0, 0, .35);
+        transform: scale(1.045);
+      }
+    }
+    @keyframes aiSpin { to { transform: rotate(360deg); } }
+
+    /* ============ Кнопка «ЖМИ СЮДА!» в Hero: стекло + мягкое «дыхание» ============
+       Стиль применяется только к кнопке в Блоке 1 (класс .btn-glass).
+       Кнопка «Написать в MAX» в Блоке 6 остаётся на прежнем стиле .btn-ai. */
+    .btn-glass {
+      /* положение: строго по центру по горизонтали, над сковородой с яичницей */
+      position: absolute;
+      top: 48%;
+      left: 50%;
+      right: auto;
+      transform: translateX(-50%);                  /* центрируем кнопку по горизонтали */
+      z-index: 10;                                  /* поверх частиц и всего остального */
+      /* размер увеличен на 20% (было font-size: 20px, padding: 18px 40px) */
+      font-size: 24px;
+      padding: 22px 48px;
+      /* усиленный стеклянный эффект */
+      background: rgba(255, 255, 255, 0.2);
+      -webkit-backdrop-filter: blur(12px);          /* для Safari */
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.5);
+      border-radius: 50px;
+      color: #ffffff;
+      font-weight: 600;
+      box-shadow: 0 0 25px rgba(0, 212, 255, 0.4), 0 0 50px rgba(0, 212, 255, 0.2), inset 0 0 20px rgba(255, 255, 255, 0.1);
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      animation: breathe 3s ease-in-out infinite;   /* очень мягкое «дыхание», не пульсация */
+    }
+
+    @keyframes breathe {
+      0%, 100% { transform: translateX(-50%) scale(1); }
+      50% { transform: translateX(-50%) scale(1.03); }
+    }
+
+    .btn-glass:hover {
+      background: rgba(255, 255, 255, 0.3);
+      box-shadow: 0 0 35px rgba(0, 212, 255, 0.6), 0 0 70px rgba(0, 212, 255, 0.25), inset 0 0 20px rgba(255, 255, 255, 0.15);
+      animation: none;                              /* «дыхание» уступает место ховеру */
+      transform: translateX(-50%) scale(1.06);
+    }
+    .btn-glass:active { transform: translateX(-50%) scale(0.98); }
+
+    /* На телефонах картинка занимает только низ экрана: кнопку ставим на яичницу
+       и чуть уменьшаем, чтобы она целиком влезала в экран */
+    @media (max-width: 640px) {
+      .btn-glass {
+        top: 88%;
+        left: 50%;
+        right: auto;
+        font-size: 20px;
+        padding: 18px 36px;
+      }
+    }
+
+    /* Исчезновение линии, соединяющей точку с кнопкой */
+    @keyframes fadeOut {
+      0% { opacity: 0.6; }
+      100% { opacity: 0; }
+    }
+
+    /* ============ Появление блоков при скролле (fade-in) ============ */
+    .js .reveal {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity .75s ease, transform .75s ease;
+      will-change: opacity, transform;
+    }
+    .js .reveal.is-visible { opacity: 1; transform: translateY(0); }
+
+    /* Для обёртки кнопки в Hero анимация появления — только по прозрачности:
+       у неё не должно быть transform, иначе она станет containing block
+       для absolute-кнопки «ЖМИ СЮДА!» */
+    .js .reveal.fade-only { transform: none; will-change: opacity; }
+    .js .reveal.fade-only.is-visible { transform: none; }
+
+    /* Карточки-«рецепты» программы: фон старой бумаги */
+    .recipe-card {
+      background: linear-gradient(180deg, #FBF3DF 0%, #F3E3C3 100%);
+      border: 1px solid #E0C79A;
+    }
+
+    /* ============ Шапка: прозрачная на первом экране, тёмная при прокрутке ============ */
+    header {
+      background: transparent;                   /* на первом экране фона нет */
+      border-bottom: none;
+      transition: background-color .3s ease, backdrop-filter .3s ease, -webkit-backdrop-filter .3s ease, box-shadow .3s ease;
+    }
+    /* Фон появляется плавно, когда прокрутили больше 100px (см. JS) */
+    header.is-scrolled {
+      background: rgba(26, 26, 46, 0.9);
+      -webkit-backdrop-filter: blur(10px);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, .3);
+    }
+
+    /* Логотип — белый текст без фона (лёгкая тень, чтобы читался на картинке) */
+    header .nav-logo {
+      color: #ffffff;
+      text-shadow: 0 2px 6px rgba(0, 0, 0, .55);
+    }
+
+    /* Ссылки в шапке — стеклянные «таблетки» */
+    .nav-link {
+      display: inline-block;
+      background: rgba(255, 255, 255, 0.1);
+      -webkit-backdrop-filter: blur(8px);        /* для Safari */
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      border-radius: 25px;
+      color: #ffffff;
+      padding: 10px 20px;
+      font-size: 16px;
+      font-weight: 600;
+      text-decoration: none;
+      white-space: nowrap;
+      transition: all 0.3s ease;
+    }
+    .nav-link:hover {
+      background: rgba(255, 255, 255, 0.2);
+      border-color: rgba(255, 255, 255, 0.5);
+    }
+
+    /* Кнопка «Записаться» — чуть заметнее остальных */
+    .nav-link.nav-cta {
+      background: rgba(0, 212, 255, 0.2);
+      border-color: rgba(0, 212, 255, 0.5);
+      color: #ffffff;
+      font-weight: 600;
+    }
+    .nav-link.nav-cta:hover {
+      background: rgba(0, 212, 255, 0.32);
+      border-color: rgba(0, 212, 255, 0.7);
+    }
+
+    /* Мобильное меню: свой тёмный фон, чтобы читалось на прозрачной шапке */
+    #mobile-menu {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height .35s ease;
+      background: rgba(26, 26, 46, 0.95);
+      -webkit-backdrop-filter: blur(10px);
+      backdrop-filter: blur(10px);
+    }
+    #mobile-menu.is-open { max-height: 28rem; }
+
+    /* Уважаем системную настройку «уменьшить движение» */
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      .js .reveal { opacity: 1 !important; transform: none !important; transition: none; }
+      .btn-ai, .btn-ai__ring { animation: none !important; }
+      .ai-nodes-container { display: none !important; } /* уважаем настройку «уменьшить движение» */
+    }
+  </style>
+</head>
+<body class="font-sans antialiased">
+
+  <!-- ================= ФИКСИРОВАННОЕ МЕНЮ (прозрачное на первом экране) ================= -->
+  <header class="fixed left-0 top-0 z-50 w-full">
+    <nav class="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3" aria-label="Главное меню">
+      <a href="#hero" class="nav-logo flex items-center gap-2 no-underline">
+        <span class="text-2xl" aria-hidden="true">🍳</span>
+        <span class="text-lg font-extrabold leading-tight sm:text-xl">ИИшница<span class="hidden sm:inline"> для Чайников</span></span>
+      </a>
+
+      <!-- Ссылки для планшетов и компьютеров — в стеклянном стиле -->
+      <ul class="hidden items-center gap-3 md:flex">
+        <li><a class="nav-link" href="#about">О курсе</a></li>
+        <li><a class="nav-link" href="#program">Программа</a></li>
+        <li><a class="nav-link" href="#how">Как проходит</a></li>
+        <li><a class="nav-link nav-cta" href="#contacts">Записаться</a></li>
+      </ul>
+
+      <!-- Кнопка меню для смартфонов: крупная, удобная для нажатия пальцем -->
+      <button id="menu-toggle" type="button"
+              class="flex min-h-[52px] items-center gap-2 rounded-full border-2 border-white/40 px-4 py-2 text-lg font-bold text-white md:hidden"
+              aria-expanded="false" aria-controls="mobile-menu">
+        <span id="menu-icon" aria-hidden="true">☰</span> Меню
+      </button>
+    </nav>
+
+    <!-- Выпадающее меню на мобильном -->
+    <div id="mobile-menu" class="md:hidden">
+      <ul class="mx-auto flex max-w-6xl flex-col gap-1 px-4 pb-4">
+        <li><a class="block rounded-xl px-4 py-4 text-xl font-bold text-cream hover:bg-white/15" href="#about">О курсе</a></li>
+        <li><a class="block rounded-xl px-4 py-4 text-xl font-bold text-cream hover:bg-white/15" href="#program">Программа</a></li>
+        <li><a class="block rounded-xl px-4 py-4 text-xl font-bold text-cream hover:bg-white/15" href="#how">Как проходит</a></li>
+        <li><a class="block rounded-xl bg-aiblue px-4 py-4 text-xl font-extrabold text-[#06222B] hover:bg-white" href="#contacts">Записаться</a></li>
+      </ul>
+    </div>
+  </header>
+
+  <main>
+    <!-- ================= БЛОК 1: HERO (на весь экран) ================= -->
+    <!-- Картинка hero.jpg задана фоном в CSS (#hero).
+         Никакого дублирующего текста: название курса уже написано на самой картинке. -->
+    <section id="hero" class="hero text-center">
+
+      <!-- Кнопка «ЖМИ СЮДА!» — стеклянный эффект (glassmorphism).
+           z-index: 10 — поверх частиц. Клик → плавный скролл к Блоку 6 (#contacts) -->
+      <div class="hero__cta reveal fade-only w-full">
+        <a href="#contacts" id="hero-cta" class="btn-big btn-glass">ЖМИ СЮДА!</a>
+      </div>
+
+      <!-- Заголовок страницы — только для поисковиков и screen-reader.
+           Визуально его нет, чтобы не дублировать надпись на картинке.
+           Если он не нужен совсем — просто удалите эту строку. -->
+      <h1 id="hero-title" class="sr-only">ИИшница для Чайников</h1>
+    </section>
+
+    <!-- ================= БЛОК 2: О КУРСЕ + 3 КАРТОЧКИ ================= -->
+    <section id="about" class="bg-gradient-to-b from-cream via-paper to-cream px-5 py-16 sm:py-24">
+      <div class="mx-auto max-w-6xl">
+        <div class="reveal mx-auto max-w-4xl text-center">
+          <h2 class="text-3xl font-black text-browndeep sm:text-4xl lg:text-5xl">
+            10 уроков по 30 минут. Научитесь пользоваться искусственным интеллектом так же легко, как готовить яичницу
+          </h2>
+          <p class="mx-auto mt-6 max-w-3xl text-xl font-semibold text-brown sm:text-2xl">
+            Курс для тех, кто хочет идти в ногу со временем, но боится сложных технологий
+          </p>
+        </div>
+
+        <!-- Три крупные карточки: на мобильном — друг под другом, на десктопе — в ряд -->
+        <div class="mt-12 grid gap-6 sm:gap-8 md:grid-cols-3">
+
+          <!-- Карточка 1: теплый зеленый -->
+          <article class="reveal rounded-3xl border-t-8 border-leaf bg-white p-7 shadow-lg shadow-brown/10 transition duration-300 hover:-translate-y-2 hover:shadow-2xl">
+            <div class="flex h-20 w-20 items-center justify-center rounded-2xl bg-[#E8F3DC] text-4xl" aria-hidden="true">🌱</div>
+            <p class="mt-5 text-xl font-bold leading-snug text-ink sm:text-2xl">
+              Вам 50+ и вы хотите идти в ногу со временем
+            </p>
+          </article>
+
+          <!-- Карточка 2: теплый коричневый/оранжевый -->
+          <article class="reveal rounded-3xl border-t-8 border-warm bg-white p-7 shadow-lg shadow-brown/10 transition duration-300 hover:-translate-y-2 hover:shadow-2xl">
+            <div class="flex h-20 w-20 items-center justify-center rounded-2xl bg-[#FBE6D2] text-4xl" aria-hidden="true">☕</div>
+            <p class="mt-5 text-xl font-bold leading-snug text-ink sm:text-2xl">
+              У вас есть только смартфон (компьютер не обязателен)
+            </p>
+          </article>
+
+          <!-- Карточка 3: голубой — символ безопасности -->
+          <article class="reveal rounded-3xl border-t-8 border-aiblue bg-white p-7 shadow-lg shadow-brown/10 transition duration-300 hover:-translate-y-2 hover:shadow-2xl">
+            <div class="flex h-20 w-20 items-center justify-center rounded-2xl bg-[#D9F6FF] text-4xl" aria-hidden="true">🥘</div>
+            <p class="mt-5 text-xl font-bold leading-snug text-ink sm:text-2xl">
+              Вы боитесь нажать «не туда» и всё сломать
+            </p>
+          </article>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= БЛОК 3: ПРОГРАММА КУРСА (10 карточек-рецептов) ================= -->
+    <section id="program" class="bg-[#FFF3E0] px-5 py-16 sm:py-24">
+      <div class="mx-auto max-w-6xl">
+        <div class="reveal mx-auto max-w-3xl text-center">
+          <h2 class="text-3xl font-black text-browndeep sm:text-4xl lg:text-5xl">Что вы освоите за 10 уроков</h2>
+          <p class="mt-5 text-xl font-semibold text-brown sm:text-2xl">
+            Каждый урок — как простой рецепт: понятно, по шагам и без сложных слов
+          </p>
+        </div>
+
+        <!-- Сетка: 2 колонки на десктопе, 1 колонка на мобильном -->
+        <div class="mt-12 grid gap-6 md:grid-cols-2">
+
+          <!-- Урок 1 -->
+          <article class="recipe-card reveal rounded-3xl p-5 shadow-md transition duration-300 hover:-translate-y-1 hover:shadow-xl">
+            <!-- ЗАГЛУШКА: замените div на <img src="lesson1.jpg" alt="Урок 1" class="aspect-video w-full rounded-2xl object-cover"> -->
+            <div class="flex aspect-video w-full items-center justify-center rounded-2xl bg-gray-300 text-2xl font-bold text-gray-600">
+              Урок 1
+            </div>
+            <div class="mt-4 flex flex-wrap items-baseline gap-x-3">
+              <span class="text-3xl font-black text-golddeep sm:text-4xl">Урок 1</span>
+              <p class="text-xl font-bold text-ink sm:text-2xl">ИИ — это актер</p>
+            </div>
+          </article>
+
+          <!-- Урок 2 -->
+          <article class="recipe-card reveal rounded-3xl p-5 shadow-md transition duration-300 hover:-translate-y-1 hover:shadow-xl">
+            <!-- ЗАГЛУШКА: замените div на <img src="lesson2.jpg" alt="Урок 2" class="aspect-video w-full rounded-2xl object-cover"> -->
+            <div class="flex aspect-video w-full items-center justify-center rounded-2xl bg-gray-300 text-2xl font-bold text-gray-600">
+              Урок 2
+            </div>
+            <div class="mt-4 flex flex-wrap items-baseline gap-x-3">
+              <span class="text-3xl font-black text-golddeep sm:text-4xl">Урок 2</span>
+              <p class="text-xl font-bold text-ink sm:text-2xl">Уточняем запрос</p>
+            </div>
+          </article>
+
+          <!-- Урок 3 -->
+          <article class="recipe-card reveal rounded-3xl p-5 shadow-md transition duration-300 hover:-translate-y-1 hover:shadow-xl">
+            <!-- ЗАГЛУШКА: замените div на <img src="lesson3.jpg" alt="Урок 3" class="aspect-video w-full rounded-2xl object-cover"> -->
+            <div class="flex aspect-video w-full items-center justify-center rounded-2xl bg-gray-300 text-2xl font-bold text-gray-600">
+              Урок 3
+            </div>
+            <div class="mt-4 flex flex-wrap items-baseline gap-x-3">
+              <span class="text-3xl font-black text-golddeep sm:text-4xl">Урок 3</span>
+              <p class="text-xl font-bold text-ink sm:text-2xl">Личный помощник</p>
+            </div>
+          </article>
+
+          <!-- Урок 4 -->
+          <article class="recipe-card reveal rounded-3xl p-5 shadow-md transition duration-300 hover:-translate-y-1 hover:shadow-xl">
+            <!-- ЗАГЛУШКА: замените div на <img src="lesson4.jpg" alt="Урок 4" class="aspect-video w-full rounded-2xl object-cover"> -->
+            <div class="flex aspect-video w-full items-center justify-center rounded-2xl bg-gray-300 text-2xl font-bold text-gray-600">
+              Урок 4
+            </div>
+            <div class="mt-4 flex flex-wrap items-baseline gap-x-3">
+              <span class="text-3xl font-black text-golddeep sm:text-4xl">Урок 4</span>
+              <p class="text-xl font-bold text-ink sm:text-2xl">Идеи из ничего</p>
+            </div>
+          </article>
+
+          <!-- Урок 5 -->
+          <article class="recipe-card reveal rounded-3xl p-5 shadow-md transition duration-300 hover:-translate-y-1 hover:shadow-xl">
+            <!-- ЗАГЛУШКА: замените div на <img src="lesson5.jpg" alt="Урок 5" class="aspect-video w-full rounded-2xl object-cover"> -->
+            <div class="flex aspect-video w-full items-center justify-center rounded-2xl bg-gray-300 text-2xl font-bold text-gray-600">
+              Урок 5
+            </div>
+            <div class="mt-4 flex flex-wrap items-baseline gap-x-3">
+              <span class="text-3xl font-black text-golddeep sm:text-4xl">Урок 5</span>
+              <p class="text-xl font-bold text-ink sm:text-2xl">Упрощаем тексты</p>
+            </div>
+          </article>
+
+          <!-- Урок 6 -->
+          <article class="recipe-card reveal rounded-3xl p-5 shadow-md transition duration-300 hover:-translate-y-1 hover:shadow-xl">
+            <!-- ЗАГЛУШКА: замените div на <img src="lesson6.jpg" alt="Урок 6" class="aspect-video w-full rounded-2xl object-cover"> -->
+            <div class="flex aspect-video w-full items-center justify-center rounded-2xl bg-gray-300 text-2xl font-bold text-gray-600">
+              Урок 6
+            </div>
+            <div class="mt-4 flex flex-wrap items-baseline gap-x-3">
+              <span class="text-3xl font-black text-golddeep sm:text-4xl">Урок 6</span>
+              <p class="text-xl font-bold text-ink sm:text-2xl">Пишем сказки и стихи</p>
+            </div>
+          </article>
+
+          <!-- Урок 7 -->
+          <article class="recipe-card reveal rounded-3xl p-5 shadow-md transition duration-300 hover:-translate-y-1 hover:shadow-xl">
+            <!-- ЗАГЛУШКА: замените div на <img src="lesson7.jpg" alt="Урок 7" class="aspect-video w-full rounded-2xl object-cover"> -->
+            <div class="flex aspect-video w-full items-center justify-center rounded-2xl bg-gray-300 text-2xl font-bold text-gray-600">
+              Урок 7
+            </div>
+            <div class="mt-4 flex flex-wrap items-baseline gap-x-3">
+              <span class="text-3xl font-black text-golddeep sm:text-4xl">Урок 7</span>
+              <p class="text-xl font-bold text-ink sm:text-2xl">Выжимка сути</p>
+            </div>
+          </article>
+
+          <!-- Урок 8 -->
+          <article class="recipe-card reveal rounded-3xl p-5 shadow-md transition duration-300 hover:-translate-y-1 hover:shadow-xl">
+            <!-- ЗАГЛУШКА: замените div на <img src="lesson8.jpg" alt="Урок 8" class="aspect-video w-full rounded-2xl object-cover"> -->
+            <div class="flex aspect-video w-full items-center justify-center rounded-2xl bg-gray-300 text-2xl font-bold text-gray-600">
+              Урок 8
+            </div>
+            <div class="mt-4 flex flex-wrap items-baseline gap-x-3">
+              <span class="text-3xl font-black text-golddeep sm:text-4xl">Урок 8</span>
+              <p class="text-xl font-bold text-ink sm:text-2xl">Помощь в хобби</p>
+            </div>
+          </article>
+
+          <!-- Урок 9 -->
+          <article class="recipe-card reveal rounded-3xl p-5 shadow-md transition duration-300 hover:-translate-y-1 hover:shadow-xl">
+            <!-- ЗАГЛУШКА: замените div на <img src="lesson9.jpg" alt="Урок 9" class="aspect-video w-full rounded-2xl object-cover"> -->
+            <div class="flex aspect-video w-full items-center justify-center rounded-2xl bg-gray-300 text-2xl font-bold text-gray-600">
+              Урок 9
+            </div>
+            <div class="mt-4 flex flex-wrap items-baseline gap-x-3">
+              <span class="text-3xl font-black text-golddeep sm:text-4xl">Урок 9</span>
+              <p class="text-xl font-bold text-ink sm:text-2xl">Техника безопасности</p>
+            </div>
+          </article>
+
+          <!-- Урок 10 -->
+          <article class="recipe-card reveal rounded-3xl p-5 shadow-md transition duration-300 hover:-translate-y-1 hover:shadow-xl">
+            <!-- ЗАГЛУШКА: замените div на <img src="lesson10.jpg" alt="Урок 10" class="aspect-video w-full rounded-2xl object-cover"> -->
+            <div class="flex aspect-video w-full items-center justify-center rounded-2xl bg-gray-300 text-2xl font-bold text-gray-600">
+              Урок 10
+            </div>
+            <div class="mt-4 flex flex-wrap items-baseline gap-x-3">
+              <span class="text-3xl font-black text-golddeep sm:text-4xl">Урок 10</span>
+              <p class="text-xl font-bold text-ink sm:text-2xl">Ваш личный ИИ</p>
+            </div>
+          </article>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= БЛОК 4: КАК ПРОХОДИТ ОБУЧЕНИЕ ================= -->
+    <section id="how" class="bg-gradient-to-b from-[#FFF3E0] to-cream px-5 py-16 sm:py-24">
+      <div class="mx-auto max-w-4xl">
+        <div class="reveal text-center">
+          <h2 class="text-3xl font-black text-browndeep sm:text-4xl lg:text-5xl">Общайтесь с ИИ как с живым человеком</h2>
+          <p class="mx-auto mt-5 max-w-2xl text-xl font-semibold text-brown sm:text-2xl">
+            Никаких команд и сложных кнопок — просто говорите голосом, как по телефону
+          </p>
+        </div>
+
+        <!-- Макет смартфона с интерфейсом мессенджера MAX -->
+        <div class="reveal mt-12 flex justify-center">
+          <div id="phone-mockup" class="w-full max-w-[380px] rounded-[2.75rem] border-[10px] border-[#2A2118] bg-[#2A2118] shadow-2xl">
+            <div class="overflow-hidden rounded-[2rem] bg-white">
+
+              <!-- Шапка MAX: сине-фиолетовые градиенты -->
+              <div class="bg-gradient-to-r from-[#4F46E5] via-[#6D5BF6] to-[#9333EA] px-4 pb-3 pt-3 text-white">
+                <div class="mx-auto mb-3 h-1.5 w-16 rounded-full bg-white/40" aria-hidden="true"></div>
+                <div class="flex items-center gap-3">
+                  <div class="flex h-12 w-12 items-center justify-center rounded-full bg-white/25 text-2xl" aria-hidden="true">✨</div>
+                  <div>
+                    <p class="text-lg font-bold leading-tight">MAX · ИИ-помощник</p>
+                    <p class="text-sm font-semibold text-white/90">онлайн</p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Лента сообщений -->
+              <div class="flex flex-col gap-4 bg-[#F4F1FA] px-3 py-5">
+
+                <!-- Сообщение 1: голосовое от вас (справа, зеленый пузырь) -->
+                <div class="flex flex-col items-end gap-1">
+                  <div class="max-w-[88%] rounded-2xl rounded-br-md bg-[#D9FDD3] p-3 shadow-sm">
+                    <p class="flex items-center gap-2 text-base font-bold text-[#1B5E20]">
+                      <span class="text-xl" aria-hidden="true">🎙️</span> Голосовое (0:08)
+                    </p>
+                    <p class="mt-2 text-lg leading-snug text-ink">
+                      «Пришло письмо из соцзащиты, ничего не понятно. Мне надо туда идти или нет?»
+                    </p>
+                  </div>
+                  <span class="pr-2 text-sm font-semibold text-gray-600">вы · 10:24</span>
+                </div>
+
+                <!-- Сообщение 2: ответ ИИ (слева, белый пузырь) -->
+                <div class="flex flex-col items-start gap-1">
+                  <div class="max-w-[88%] rounded-2xl rounded-bl-md bg-white p-3 shadow-sm">
+                    <p class="flex items-center gap-2 text-base font-bold text-[#5B21B6]">
+                      <span class="text-xl" aria-hidden="true">✨</span> ИИ-помощник
+                    </p>
+                    <p class="mt-2 text-lg leading-snug text-ink">
+                      Это просто информационное уведомление, никуда идти не нужно и платить тоже. Хотите, я напишу им ответ?
+                    </p>
+                  </div>
+                  <span class="pl-2 text-sm font-semibold text-gray-600">MAX · 10:24</span>
+                </div>
+
+                <!-- Сообщение 3: ваш ответ (справа, зеленый пузырь) -->
+                <div class="flex flex-col items-end gap-1">
+                  <div class="max-w-[88%] rounded-2xl rounded-br-md bg-[#D9FDD3] p-3 shadow-sm">
+                    <p class="text-lg leading-snug text-ink">Да, напиши вежливо</p>
+                  </div>
+                  <span class="pr-2 text-sm font-semibold text-gray-600">вы · 10:25</span>
+                </div>
+
+                <!-- Сообщение 4: готовый ответ (слева, белый пузырь) -->
+                <div class="flex flex-col items-start gap-1">
+                  <div class="max-w-[88%] rounded-2xl rounded-bl-md bg-white p-3 shadow-sm">
+                    <p class="flex items-center gap-2 text-base font-bold text-[#5B21B6]">
+                      <span class="text-xl" aria-hidden="true">✨</span> ИИ-помощник
+                    </p>
+                    <p class="mt-2 text-lg leading-snug text-ink">
+                      Готово! Текст скопирован, можете отправлять 😉
+                    </p>
+                  </div>
+                  <span class="pl-2 text-sm font-semibold text-gray-600">MAX · 10:25</span>
+                </div>
+
+              </div>
+
+              <!-- Строка ввода (для наглядности, не рабочая) -->
+              <div class="flex items-center gap-2 border-t border-gray-200 bg-white px-3 py-3">
+                <div class="flex-1 rounded-full bg-gray-100 px-4 py-3 text-base text-gray-600">Сообщение…</div>
+                <div class="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-[#4F46E5] to-[#9333EA] text-xl text-white" aria-hidden="true">✨</div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+        <p class="reveal mx-auto mt-10 max-w-2xl text-center text-xl font-bold text-brown sm:text-2xl">
+          MAX сам слушает вас, читает сложные бумаги и пишет ответы. Просто нажмите на звездочку ✨ и скажите, что нужно.
+        </p>
+      </div>
+    </section>
+
+    <!-- ================= БЛОК 5: О ПРОЕКТЕ ================= -->
+    <section id="about-project" class="bg-beige px-5 py-16 sm:py-24">
+      <div class="mx-auto max-w-3xl text-center">
+        <h2 class="reveal text-3xl font-black text-browndeep sm:text-4xl lg:text-5xl">Почему этот курс — для вас</h2>
+        <div class="reveal mt-9 space-y-6 text-xl leading-relaxed text-ink sm:text-2xl">
+          <p>
+            Мы создали этот курс специально для людей, которые не хотят отставать от времени, но не любят сложные инструкции и технический жаргон.
+          </p>
+          <p>
+            Никакой теории — только практика. Никакого страха — только поддержка. Мы на связи на каждом шагу и поможем, если что-то не получится.
+          </p>
+          <p class="font-extrabold text-golddeep">
+            Курс бесплатный и занимает всего 30 минут в неделю.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= БЛОК 6: КОНТАКТЫ И ЗАПИСЬ ================= -->
+    <section id="contacts" class="bg-[#2A1608] bg-gradient-to-b from-browndeep to-[#2A1608] px-5 py-20 sm:py-28">
+      <div class="mx-auto max-w-3xl text-center">
+        <h2 class="reveal text-3xl font-black text-gold sm:text-4xl lg:text-5xl">Готовы попробовать?</h2>
+
+        <!-- Две крупные кнопки по центру -->
+        <div class="reveal mt-10 flex flex-col items-stretch justify-center gap-5 sm:flex-row sm:items-center">
+          <!-- Кнопка 1: главная, голубая со свечением -->
+          <a href="#max-link" class="btn-big btn-ai w-full sm:w-auto">
+            <span class="btn-ai__ring" aria-hidden="true"></span>
+            <span class="btn-ai__dots" aria-hidden="true"></span>
+            <span class="relative z-10 flex items-center gap-2">
+              <span class="text-2xl" aria-hidden="true">✨</span>
+              <span>Написать в MAX</span>
+            </span>
+          </a>
+
+          <!-- Кнопка 2: вторичная, белая с цветной рамкой -->
+          <a href="mailto:aiishnica@example.ru" class="btn-big w-full border-4 border-gold bg-white text-browndeep hover:bg-cream sm:w-auto">
+            <span class="text-2xl" aria-hidden="true">✉️</span>
+            <span>Написать на почту</span>
+          </a>
+        </div>
+
+        <p class="reveal mx-auto mt-10 max-w-2xl text-xl font-semibold text-cream sm:text-2xl">
+          Мы на связи. Ответим на любой вопрос, поможем установить MAX и сделать первый шаг.
+        </p>
+      </div>
+    </section>
+  </main>
+
+  <!-- ================= ФУТЕР ================= -->
+  <footer class="bg-[#2A1608] px-5 py-8 text-center">
+    <p class="text-lg font-semibold text-[#F0DCBE]">© 2026 ИИшница для Чайников. Все права защищены.</p>
+  </footer>
+
+  <!-- ================= JAVASCRIPT ================= -->
+  <script>
+    (function () {
+      'use strict';
+
+      /* ---------- 1. Мобильное меню ---------- */
+      var toggle = document.getElementById('menu-toggle');
+      var menu = document.getElementById('mobile-menu');
+      var icon = document.getElementById('menu-icon');
+
+      function closeMenu() {
+        if (!toggle || !menu) { return; }
+        menu.classList.remove('is-open');
+        toggle.setAttribute('aria-expanded', 'false');
+        if (icon) { icon.textContent = '☰'; }
+      }
+
+      if (toggle && menu) {
+        toggle.addEventListener('click', function () {
+          var isOpen = menu.classList.toggle('is-open');
+          toggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+          if (icon) { icon.textContent = isOpen ? '✕' : '☰'; }
+        });
+
+        // Закрываем меню после клика по ссылке
+        menu.addEventListener('click', function (event) {
+          if (event.target.closest('a')) { closeMenu(); }
+        });
+
+        // Закрываем меню при переходе на широкий экран и по клавише Escape
+        window.addEventListener('resize', function () {
+          if (window.innerWidth >= 768) { closeMenu(); }
+        });
+        document.addEventListener('keydown', function (event) {
+          if (event.key === 'Escape') { closeMenu(); }
+        });
+      }
+
+      /* ---------- 2. Плавный скролл по якорным ссылкам ---------- */
+      var anchors = document.querySelectorAll('a[href^="#"]');
+      Array.prototype.forEach.call(anchors, function (link) {
+        link.addEventListener('click', function (event) {
+          var hash = link.getAttribute('href');
+          if (!hash || hash === '#') { return; }
+          var target = document.querySelector(hash);
+          if (!target) { return; } // ссылка-заглушка (#max-link) — оставляем как есть
+          event.preventDefault();
+          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          if (window.history && window.history.replaceState) {
+            window.history.replaceState(null, '', hash);
+          }
+        });
+      });
+
+      /* ---------- 3. Плавное появление блоков при скролле ---------- */
+      var revealItems = document.querySelectorAll('.reveal');
+
+      function showAll() {
+        Array.prototype.forEach.call(revealItems, function (item) {
+          item.classList.add('is-visible');
+        });
+      }
+
+      if ('IntersectionObserver' in window) {
+        var observerFired = false;
+
+        var observer = new IntersectionObserver(function (entries) {
+          observerFired = true;
+          entries.forEach(function (entry) {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('is-visible');
+              observer.unobserve(entry.target);
+            }
+          });
+        }, { threshold: 0.12, rootMargin: '0px 0px -60px 0px' });
+
+        // Небольшая задержка внутри каждой секции — элементы появляются по очереди
+        Array.prototype.forEach.call(document.querySelectorAll('section'), function (section) {
+          var items = section.querySelectorAll('.reveal');
+          Array.prototype.forEach.call(items, function (item, index) {
+            item.style.transitionDelay = (Math.min(index, 3) * 90) + 'ms';
+            observer.observe(item);
+          });
+        });
+
+        // Страховка: если наблюдатель ни разу не сработал (старый телефон или
+        // встроенный браузер мессенджера), через 3 секунды показываем все блоки,
+        // чтобы страница никогда не осталась пустой
+        window.setTimeout(function () {
+          if (!observerFired) { showAll(); }
+        }, 3000);
+      } else {
+        // Старые браузеры: просто показываем всё без анимации
+        showAll();
+      }
+
+      /* ---------- 4. Фон шапки появляется при прокрутке больше 100px ---------- */
+      var header = document.querySelector('header');
+      function updateHeader() {
+        if (!header) { return; }
+        if (window.scrollY > 100) {
+          header.classList.add('is-scrolled');      /* тёмный полупрозрачный фон + blur */
+        } else {
+          header.classList.remove('is-scrolled');   /* наверху снова прозрачная */
+        }
+      }
+      /* ---------- 5. Анимация светящихся точек нейросети в Hero ---------- */
+      /* Точки поднимаются от низа экрана вверх к кнопке «ЖМИ СЮДА!» */
+      var heroSection = document.getElementById('hero');
+      var noMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      var canAnimate = typeof document.createElement('div').animate === 'function';
+
+      if (heroSection && canAnimate && !noMotion) {
+        // 1. Контейнер для частиц
+        var nodesContainer = document.createElement('div');
+        nodesContainer.className = 'ai-nodes-container';
+        nodesContainer.setAttribute('aria-hidden', 'true');
+        nodesContainer.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:2;overflow:hidden;';
+        heroSection.appendChild(nodesContainer);
+
+        // 2. Холст для соединительных линий между близкими точками
+        var linesCanvas = document.createElement('canvas');
+        linesCanvas.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;z-index:0;';
+        nodesContainer.appendChild(linesCanvas);
+        var linesCtx = linesCanvas.getContext ? linesCanvas.getContext('2d') : null;
+
+        function sizeCanvas() {
+          var dpr = window.devicePixelRatio || 1;
+          linesCanvas.width = Math.round(nodesContainer.clientWidth * dpr);
+          linesCanvas.height = Math.round(nodesContainer.clientHeight * dpr);
+          if (linesCtx) { linesCtx.setTransform(dpr, 0, 0, dpr, 0, 0); }
+        }
+        sizeCanvas();
+        window.addEventListener('resize', sizeCanvas);
+
+        var activeNodes = [];   // список живых точек
+        var ctaButton = document.getElementById('hero-cta');   // кнопка «ЖМИ СЮДА!»
+
+        // 3. Генерация одной точки
+        function createNode() {
+          var node = document.createElement('div');
+          var size = Math.random() * 6 + 4;                        // размер 4-10px
+          var startLeftPercent = Math.random() * 100;              // случайная позиция по горизонтали, 0-100%
+          node.style.cssText =
+            'position:absolute;' +
+            'width:' + size + 'px;' +
+            'height:' + size + 'px;' +
+            'background:#00D4FF;' +
+            'border-radius:50%;' +
+            'box-shadow:0 0 ' + (size * 2) + 'px #00D4FF, 0 0 ' + (size * 3) + 'px #00D4FF;' +
+            'left:' + startLeftPercent + '%;' +
+            'bottom:-20px;' +
+            'opacity:0;' +
+            'z-index:3;';
+          nodesContainer.appendChild(node);
+          activeNodes.push(node);
+
+          var duration = Math.random() * 3000 + 3000;              // 3-6 секунд
+          var delay = Math.random() * 2000;                        // задержка до 2 секунд
+          var goesToButton = Math.random() < 0.3;                  // 30% точек летят К КНОПКЕ
+
+          if (goesToButton && ctaButton) {
+            // --- Точка летит к кнопке и в конце соединяется с ней линией ---
+            var box = nodesContainer.getBoundingClientRect();
+            var buttonRect = ctaButton.getBoundingClientRect();
+
+            // Кнопка в момент загрузки может быть сдвинута вниз анимацией появления —
+            // вычитаем этот сдвиг, чтобы точка летела в «осевшую» позицию кнопки
+            var shiftY = 0;
+            var btnTransform = window.getComputedStyle ? getComputedStyle(ctaButton).transform : '';
+            if (btnTransform && btnTransform.indexOf('matrix') === 0) {
+              var parts = btnTransform.slice(7, -1).split(',');
+              if (parts.length === 6) { shiftY = parseFloat(parts[5]) || 0; }
+            }
+
+            var buttonCenterX = buttonRect.left + buttonRect.width / 2 - box.left;
+            var buttonCenterY = buttonRect.top + buttonRect.height / 2 - box.top - shiftY;
+            var targetLeft = buttonCenterX - size / 2;
+            var targetBottom = box.height - buttonCenterY - size / 2;
+            var startLeftPx = box.width * startLeftPercent / 100;  // старт в px — чтобы полёт был плавным
+
+            node.animate([
+              { bottom: '-20px', opacity: 0, transform: 'scale(0)', left: startLeftPx + 'px' },
+              { bottom: '20%', opacity: 1, transform: 'scale(1)', offset: 0.2 },
+              { bottom: targetBottom + 'px', opacity: 1, left: targetLeft + 'px', transform: 'scale(1.5)', offset: 0.9 },
+              { bottom: targetBottom + 'px', opacity: 0, left: targetLeft + 'px', transform: 'scale(0)' }
+            ], {
+              duration: duration,
+              delay: delay,
+              iterations: 1,
+              easing: 'ease-out'
+            });
+
+            // Когда точка почти дошла до кнопки — рисуем линию к её центру
+            window.setTimeout(function () {
+              createConnectionLine(node);
+            }, duration * 0.9 + delay);
+          } else {
+            // --- Точка летит просто вверх ---
+            // Последний шаг — «calc(100% - 120px)»: точка доходит до уровня кнопки
+            // (она отступает от верха на 100px) и там растворяется.
+            node.animate([
+              { bottom: '-20px', opacity: 0, transform: 'scale(0)' },
+              { bottom: '20%', opacity: 1, transform: 'scale(1)', offset: 0.2 },
+              { bottom: '80%', opacity: 1, transform: 'scale(1)', offset: 0.8 },
+              { bottom: 'calc(100% - 120px)', opacity: 0, transform: 'scale(0.5)' }
+            ], {
+              duration: duration,
+              delay: delay,
+              iterations: 1,
+              easing: 'ease-out'
+            });
+          }
+
+          // После завершения полёта убираем точку и создаём новую — для оптимизации
+          window.setTimeout(function () {
+            var index = activeNodes.indexOf(node);
+            if (index !== -1) { activeNodes.splice(index, 1); }
+            if (node.parentNode) { node.parentNode.removeChild(node); }
+            createNode();
+          }, duration + delay);
+        }
+
+        // 3.1. Линия от точки к кнопке «ЖМИ СЮДА!»
+        function createConnectionLine(node) {
+          if (!node || !ctaButton) { return; }
+          var box = nodesContainer.getBoundingClientRect();
+          var nodeRect = node.getBoundingClientRect();
+          var buttonRect = ctaButton.getBoundingClientRect();
+
+          // Координаты считаем относительно контейнера частиц
+          var x1 = nodeRect.left - box.left + nodeRect.width / 2;
+          var y1 = nodeRect.top - box.top + nodeRect.height / 2;
+          var x2 = buttonRect.left - box.left + buttonRect.width / 2;
+          var y2 = buttonRect.top - box.top + buttonRect.height / 2;
+
+          var length = Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
+          var angle = Math.atan2(y2 - y1, x2 - x1) * 180 / Math.PI;
+
+          var line = document.createElement('div');
+          line.style.cssText =
+            'position:absolute;' +
+            'width:' + length + 'px;' +
+            'height:2px;' +
+            'background:linear-gradient(90deg, #00D4FF 0%, transparent 100%);' +
+            'opacity:0.6;' +
+            'transform-origin:left center;' +
+            'transform:rotate(' + angle + 'deg);' +
+            'left:' + x1 + 'px;' +
+            'top:' + y1 + 'px;' +
+            'z-index:2;' +
+            'pointer-events:none;' +
+            'animation:fadeOut 1s forwards;';
+          nodesContainer.appendChild(line);
+
+          window.setTimeout(function () {
+            if (line.parentNode) { line.parentNode.removeChild(line); }
+          }, 1000);
+        }
+
+        // 4. 25 точек на десктопе и 12 на мобильном (для производительности)
+        var isMobile = window.innerWidth < 768;
+        var nodeCount = isMobile ? 12 : 25;
+        for (var i = 0; i < nodeCount; i++) {
+          window.setTimeout(createNode, i * 200);
+        }
+
+        // 5. Соединительные линии между близкими точками (каждые 100 мс)
+        window.setInterval(function () {
+          if (!linesCtx) { return; }
+          var w = nodesContainer.clientWidth;
+          var h = nodesContainer.clientHeight;
+          linesCtx.clearRect(0, 0, w, h);
+
+          // Когда hero прокручен за пределы экрана — линии не рисуем
+          var heroBox = heroSection.getBoundingClientRect();
+          if (heroBox.bottom < 0 || heroBox.top > window.innerHeight) { return; }
+
+          var box = nodesContainer.getBoundingClientRect();
+          var points = [];
+          for (var k = 0; k < activeNodes.length; k++) {
+            var rect = activeNodes[k].getBoundingClientRect();
+            if (rect.width === 0) { continue; }
+            var px = rect.left - box.left + rect.width / 2;
+            var py = rect.top - box.top + rect.height / 2;
+            if (py > -10 && py < h + 10) { points.push({ x: px, y: py }); }
+          }
+
+          linesCtx.strokeStyle = '#00D4FF';
+          linesCtx.globalAlpha = 0.3;
+          linesCtx.lineWidth = 1;
+          for (var a = 0; a < points.length; a++) {
+            for (var b = a + 1; b < points.length; b++) {
+              var dx = points[a].x - points[b].x;
+              var dy = points[a].y - points[b].y;
+              if (dx * dx + dy * dy < 150 * 150) {                 // расстояние меньше 150px
+                linesCtx.beginPath();
+                linesCtx.moveTo(points[a].x, points[a].y);
+                linesCtx.lineTo(points[b].x, points[b].y);
+                linesCtx.stroke();
+              }
+            }
+          }
+          linesCtx.globalAlpha = 1;
+        }, 100);
+      }
+
+      window.addEventListener('scroll', updateHeader, { passive: true });
+      updateHeader();
+    })();
+  </script>
+</body>
+</html>
+
+
+
+
+
+
+
+
