@@ -443,6 +443,38 @@
       /* Блок 6: кнопки — 90% ширины, по центру */
       #contacts .btn-big { width: 90%; margin: 0 auto; }
     }
+
+    /* ============ БЛОК 1 (HERO) — ИСПРАВЛЕНИЕ ДЛЯ МОБИЛЬНЫХ ============ */
+    @media (max-width: 768px) {
+      /* --- Блок из ТЗ --- */
+      #hero {
+        height: 100vh;
+        height: 100dvh;
+        background-position: center center;
+        background-size: cover;
+      }
+      .cta-button {
+        font-size: 16px !important;
+        padding: 14px 28px !important;
+        top: 55% !important;
+      }
+      .edge-blur {
+        width: 60px !important;
+      }
+
+      /* --- Реальные селекторы этой страницы --- */
+      /* Убираем пустое пространство сверху (в базе было padding-top: 100px).
+         background-position меняем с center bottom на center center (см. выше). */
+      #hero {
+        padding-top: 0;
+      }
+      /* Реальная кнопка Hero — .btn-glass (класса .cta-button на странице нет) */
+      .btn-glass {
+        font-size: 16px !important;
+        padding: 14px 28px !important;
+        top: 55% !important;
+      }
+    }
   </style>
 </head>
 <body class="font-sans antialiased">
