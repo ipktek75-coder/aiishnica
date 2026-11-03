@@ -443,6 +443,29 @@
       /* Блок 6: кнопки — 90% ширины, по центру */
       #contacts .btn-big { width: 90%; margin: 0 auto; }
     }
+
+    /* ============ БЛОК 1 (HERO) — ТОЛЬКО МОБИЛЬНАЯ ВЕРСИЯ ============ */
+    @media (max-width: 768px) {
+      /* Кнопка «ЖМИ СЮДА!» меньше на 30%
+         (на мобильных база была: font-size 20px; padding 18px 36px; min-height 68px) */
+      .btn-glass {
+        font-size: 14px !important;      /* 20px − 30% */
+        padding: 13px 25px !important;   /* 18px 36px − 30% */
+        min-height: 48px !important;     /* 68px − 30% */
+        top: 55% !important;
+      }
+
+      /* Убираем чёрную пустоту вокруг картинки: подгоняем блок hero
+         под пропорции самой картинки (hero.jpg = 1536×864). Картинка не меняется. */
+      #hero {
+        padding-top: 0;
+        height: auto;
+        aspect-ratio: 1536 / 864;
+        min-height: 0;
+        background-position: center center;
+        background-size: contain;
+      }
+    }
   </style>
 </head>
 <body class="font-sans antialiased">
