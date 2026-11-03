@@ -455,13 +455,14 @@
         top: 55% !important;
       }
 
-      /* Убираем чёрную пустоту вокруг картинки: подгоняем блок hero
-         под пропорции самой картинки (hero.jpg = 1536×864). Картинка не меняется. */
+      /* Мобильный hero: отдельная ВЕРТИКАЛЬНАЯ картинка hero2.jpg (1536×2752).
+         Блок подогнан под её пропорции, чтобы картинка легла ровно, без чёрных полос. */
       #hero {
         padding-top: 0;
         height: auto;
-        aspect-ratio: 1536 / 864;
+        aspect-ratio: 1536 / 2752;
         min-height: 0;
+        background-image: url('hero2.jpg');
         background-position: center center;
         background-size: contain;
       }
