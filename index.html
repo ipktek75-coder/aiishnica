@@ -344,6 +344,105 @@
       .btn-ai, .btn-ai__ring { animation: none !important; }
       .ai-nodes-container { display: none !important; } /* уважаем настройку «уменьшить движение» */
     }
+
+    /* ============ МОБИЛЬНАЯ АДАПТАЦИЯ (max-width: 768px) ============
+       Ниже — блок из ТЗ (оставлен как есть). Часть селекторов в нём
+       (.cta-button, .edge-blur, .chat-container, .about-card, #project,
+       .contact-button, .container) на этой странице отсутствует, поэтому
+       сразу после него идёт «адаптация под реальные классы» — она и работает. */
+    @media (max-width: 768px) {
+      /* Шапка */
+      header nav {
+        flex-wrap: wrap;
+      }
+      header nav a {
+        font-size: 14px;
+        padding: 8px 12px;
+      }
+      /* Hero кнопка */
+      .cta-button {
+        font-size: 18px;
+        padding: 16px 32px;
+      }
+      .edge-blur {
+        width: 80px;
+      }
+      /* Блок 2 карточки */
+      #about .grid {
+        grid-template-columns: 1fr !important;
+        gap: 20px;
+      }
+      .about-card svg {
+        width: 56px;
+        height: 56px;
+      }
+      .about-card p {
+        font-size: 15px;
+      }
+      /* Блок 3 уроки */
+      #program .grid {
+        grid-template-columns: 1fr !important;
+      }
+      .lesson-img {
+        height: 200px;
+      }
+      .lesson-card h3 {
+        font-size: 20px;
+      }
+      /* Блок 4 чат */
+      .chat-container {
+        width: 95%;
+        margin: 0 auto;
+      }
+      .chat-bubble {
+        max-width: 90%;
+        font-size: 14px;
+      }
+      /* Блоки 5 и 6 */
+      #project h2, #contacts h2 {
+        font-size: 28px;
+      }
+      #project p, #contacts p {
+        font-size: 16px;
+      }
+      #contacts .flex {
+        flex-direction: column;
+      }
+      .contact-button {
+        width: 90%;
+        margin: 0 auto;
+      }
+      /* Общие отступы */
+      section {
+        padding: 40px 15px !important;
+      }
+      .container {
+        max-width: 100% !important;
+        padding: 0 15px;
+      }
+
+      /* ===== АДАПТАЦИЯ ПОД РЕАЛЬНЫЕ КЛАССЫ ЭТОЙ СТРАНИЦЫ ===== */
+      /* Шапка: логотип меньше, мобильное меню — в одну колонку */
+      header .nav-logo > span:last-child { font-size: 16px; }
+      #mobile-menu ul { flex-direction: column; }
+      #mobile-menu a { font-size: 16px; padding: 12px 16px; }
+      /* Hero: реальный класс кнопки — .btn-glass (она уже по центру) */
+      .btn-glass { font-size: 18px; padding: 16px 32px; }
+      /* Блок 2: карточки на инлайн-стилях — иконки и текст по контейнеру */
+      #about .grid svg { width: 56px; height: 56px; }
+      #about .grid p { font-size: 15px !important; }
+      /* Блок 3: заголовок урока — это <span>, а не <h3> */
+      #program .lesson-card span { font-size: 20px; }
+      /* Блок 4: макет телефона (#phone-mockup) и пузыри сообщений */
+      #phone-mockup { width: 95%; margin: 0 auto; }
+      #phone-mockup [class*="max-w-"] { max-width: 90%; }
+      #phone-mockup p { font-size: 14px; }
+      /* Блок 5 — это #about-project (а не #project) */
+      #about-project h2 { font-size: 28px; }
+      #about-project p { font-size: 16px; }
+      /* Блок 6: кнопки — 90% ширины, по центру */
+      #contacts .btn-big { width: 90%; margin: 0 auto; }
+    }
   </style>
 </head>
 <body class="font-sans antialiased">
